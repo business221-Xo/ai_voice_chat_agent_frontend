@@ -1,8 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
 // import Pack3000Widget from './component/Pack3000Widget_new';
-// import Pack3000WidgetNew from './component/Pack3000WidgeNew';
-import Pack3000WidgetOld from './component/Pack3000WidgetOld';
+import Pack3000WidgetNew from './component/Pack3000WidgeNew';
+// import Pack3000WidgetOld from './component/Pack3000WidgetOld';
 function App() {
   return (
     <div className="App">
@@ -17,13 +17,13 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Pack3000-old
+          Pack3000
         </a>
       </header>
 
       <div>
-          {/* <Pack3000WidgetNew /> */}
-          <Pack3000WidgetOld />
+          <Pack3000WidgetNew />
+          {/* <Pack3000WidgetOld /> */}
       </div>
     </div>
   );
