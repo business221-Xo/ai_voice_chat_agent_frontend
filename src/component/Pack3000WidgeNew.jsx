@@ -18,7 +18,7 @@ const Pack3000WidgetNew = () => {
     setMessages((prev) => [...prev, { from: 'user', text: msg }]);
 
     try {
-      const response = await fetch('ai-voice-chat-agent-backend.vercel.app/api/chat', {
+      const response = await fetch('https://ai-voice-chat-agent-backend.vercel.app/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg }),
