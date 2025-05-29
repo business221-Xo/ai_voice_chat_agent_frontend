@@ -17,7 +17,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Your Assistant-scroll
+          Your Assistant
         </a>
       </header>
 
