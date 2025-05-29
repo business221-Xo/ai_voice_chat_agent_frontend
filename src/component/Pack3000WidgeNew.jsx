@@ -185,7 +185,7 @@ const Pack3000Widget = () => {
           wordBreak: 'break-word',
         }}
       >
-        <b>{msg.from === 'user' ? 'You' : 'Pack'}:</b> {msg.text}
+        <b>{msg.from === 'user' ? 'You' : 'TREVORT'}:</b> {msg.text}
       </div>
     ));
 
