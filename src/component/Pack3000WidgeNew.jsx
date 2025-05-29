@@ -3,50 +3,48 @@ import React, { useState, useRef, useEffect } from 'react';
 const PACK_3000_LOGO = 'pack-slogan.png';
 const PHONE_NUMBER = '#11222212';
 
-const Pack3000WidgetNew = () => {
+const Pack3000Widget = () => {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState(null); // 'chat' or 'voice'
   const [messages, setMessages] = useState([
     { from: 'bot', text: 'Hello, what can I help you with?' }
   ]);
   const [input, setInput] = useState('');
+
   const recognitionRef = useRef(null);
+  const silenceTimeoutRef = useRef(null);
   const isSpeakingRef = useRef(false);
 
   // Send message to backend and get AI response
   const sendMessage = async (msg) => {
-    setMessages((prev) => [...prev, { from: 'user', text: msg }]);
+    setMessages(prev => [...prev, { from: 'user', text: msg }]);
 
     try {
-      const response = await fetch('https://ai-voice-chat-agent-backend.vercel.app/api/chat', {
+      const response = await fetch('https://ai-voice-chat-agent-backend.vercel.app/api/chat', { // Replace with your backend URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg }),
       });
 
-      if (!response.ok) {
-        throw new Error('AI response error');
-      }
+      if (!response.ok) throw new Error('AI response error');
 
       const data = await response.json();
       const aiResponse = data.reply;
 
-      setMessages((prev) => [...prev, { from: 'bot', text: aiResponse }]);
+      setMessages(prev => [...prev, { from: 'bot', text: aiResponse }]);
 
       if (mode === 'voice') {
-        // Stop recognition before speaking to avoid overlap
+        // Stop recognition while speaking to avoid overlap
         stopRecognition();
-
         speak(aiResponse);
       }
-    } 
-    catch (error) {
-      setMessages((prev) => [...prev, { from: 'bot', text: 'Sorry, something went wrong.' }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { from: 'bot', text: 'Sorry, something went wrong.' }]);
       console.error(error);
     }
   };
 
-  // Start voice recognition
+  // Start speech recognition with silence detection
   const startRecognition = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       alert('Voice recognition not supported in this browser.');
@@ -55,19 +53,30 @@ const Pack3000WidgetNew = () => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
+
     recognition.lang = 'en-US';
     recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.continuous = true;
 
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
+      if (!event.results) return;
+
+      const transcript = event.results[event.results.length - 1][0].transcript.trim();
       setInput(transcript);
-      sendMessage(transcript);
+
+      // Reset silence timer on every speech result
+      resetSilenceTimer(() => {
+        // When silence detected, send message
+        if (transcript) {
+          sendMessage(transcript);
+          setInput('');
+        }
+      });
     };
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
-      // Restart recognition on certain errors to keep conversation going
+      // Restart recognition on recoverable errors
       if (event.error === 'no-speech' || event.error === 'aborted' || event.error === 'network') {
         recognition.stop();
         setTimeout(() => {
@@ -77,7 +86,7 @@ const Pack3000WidgetNew = () => {
     };
 
     recognition.onend = () => {
-      // If not speaking and still in voice mode, restart recognition to listen again
+      // Restart recognition if not speaking and still in voice mode
       if (!isSpeakingRef.current && mode === 'voice') {
         recognition.start();
       }
@@ -85,9 +94,23 @@ const Pack3000WidgetNew = () => {
 
     recognition.start();
     recognitionRef.current = recognition;
+
+    // Start silence timer initially
+    resetSilenceTimer(() => {
+      // If silence detected before any speech, do nothing or prompt user
+      console.log('No speech detected for 4 seconds');
+    });
   };
 
-  // Stop voice recognition
+  // Reset the silence detection timer (4 seconds)
+  const resetSilenceTimer = (callback) => {
+    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+    silenceTimeoutRef.current = setTimeout(() => {
+      callback();
+    }, 4000); // 4 seconds of silence
+  };
+
+  // Stop speech recognition and clear timers
   const stopRecognition = () => {
     if (recognitionRef.current) {
       recognitionRef.current.onresult = null;
@@ -96,9 +119,13 @@ const Pack3000WidgetNew = () => {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
+    if (silenceTimeoutRef.current) {
+      clearTimeout(silenceTimeoutRef.current);
+      silenceTimeoutRef.current = null;
+    }
   };
 
-  // Voice synthesis with continuous voice chat support
+  // Speak AI response and restart recognition after speaking
   const speak = (text) => {
     if ('speechSynthesis' in window) {
       isSpeakingRef.current = true;
@@ -106,7 +133,6 @@ const Pack3000WidgetNew = () => {
 
       utter.onend = () => {
         isSpeakingRef.current = false;
-        // After speaking, restart recognition to listen for next user input
         if (mode === 'voice') {
           startRecognition();
         }
@@ -124,7 +150,7 @@ const Pack3000WidgetNew = () => {
     }
   };
 
-  // Handle chat/voice button
+  // Handle mode selection and initialize
   const handleOpen = (selectedMode) => {
     setOpen(true);
     setMode(selectedMode);
@@ -146,7 +172,7 @@ const Pack3000WidgetNew = () => {
     };
   }, []);
 
-  // Render messages
+  // Render chat messages
   const renderMessages = () =>
     messages.map((msg, idx) => (
       <div
@@ -162,7 +188,7 @@ const Pack3000WidgetNew = () => {
           wordBreak: 'break-word',
         }}
       >
-        <b>{msg.from === 'user' ? 'You' : 'Pack'}:</b> {msg.text}
+        <b>{msg.from === 'user' ? 'You' : 'Pack 3000'}:</b> {msg.text}
       </div>
     ));
 
@@ -175,7 +201,7 @@ const Pack3000WidgetNew = () => {
         width: 350,
         zIndex: 9999,
         fontFamily: 'Arial, sans-serif',
-        boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -273,4 +299,4 @@ const Pack3000WidgetNew = () => {
   );
 };
 
-export default Pack3000WidgetNew;
+export default Pack3000Widget;
