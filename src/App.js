@@ -13,11 +13,11 @@ function App() {
         </p> */}
         <a
           className="App-link"
-          href="https://pack3000.com"
+          href="https://www.softwaredevelopmentgroup.net"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Pack3000
+          Your Assistant-scroll
         </a>
       </header>
 

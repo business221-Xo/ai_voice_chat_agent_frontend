@@ -15,12 +15,22 @@ const Pack3000Widget = () => {
   const silenceTimeoutRef = useRef(null);
   const isSpeakingRef = useRef(false);
 
+  // NEW: Ref for chat container
+  const chatContainerRef = useRef(null);
+
+  // NEW: Scroll to bottom when messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   // Send message to backend and get AI response
   const sendMessage = async (msg) => {
     setMessages(prev => [...prev, { from: 'user', text: msg }]);
 
     try {
-      const response = await fetch('https://ai-voice-chat-agent-backend.vercel.app/api/chat', { // Replace with your backend URL
+      const response = await fetch('https://ai-voice-chat-agent-backend.vercel.app/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg }),
@@ -34,7 +44,6 @@ const Pack3000Widget = () => {
       setMessages(prev => [...prev, { from: 'bot', text: aiResponse }]);
 
       if (mode === 'voice') {
-        // Stop recognition while speaking to avoid overlap
         stopRecognition();
         speak(aiResponse);
       }
@@ -44,7 +53,8 @@ const Pack3000Widget = () => {
     }
   };
 
-  // Start speech recognition with silence detection
+  // ... (rest of your voice recognition and speech synthesis code remains unchanged)
+
   const startRecognition = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       alert('Voice recognition not supported in this browser.');
@@ -64,9 +74,7 @@ const Pack3000Widget = () => {
       const transcript = event.results[event.results.length - 1][0].transcript.trim();
       setInput(transcript);
 
-      // Reset silence timer on every speech result
       resetSilenceTimer(() => {
-        // When silence detected, send message
         if (transcript) {
           sendMessage(transcript);
           setInput('');
@@ -76,7 +84,6 @@ const Pack3000Widget = () => {
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
-      // Restart recognition on recoverable errors
       if (event.error === 'no-speech' || event.error === 'aborted' || event.error === 'network') {
         recognition.stop();
         setTimeout(() => {
@@ -86,7 +93,6 @@ const Pack3000Widget = () => {
     };
 
     recognition.onend = () => {
-      // Restart recognition if not speaking and still in voice mode
       if (!isSpeakingRef.current && mode === 'voice') {
         recognition.start();
       }
@@ -95,14 +101,11 @@ const Pack3000Widget = () => {
     recognition.start();
     recognitionRef.current = recognition;
 
-    // Start silence timer initially
     resetSilenceTimer(() => {
-      // If silence detected before any speech, do nothing or prompt user
       console.log('No speech detected for 4 seconds');
     });
   };
 
-  // Reset the silence detection timer (4 seconds)
   const resetSilenceTimer = (callback) => {
     if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
     silenceTimeoutRef.current = setTimeout(() => {
@@ -110,7 +113,6 @@ const Pack3000Widget = () => {
     }, 4000); // 4 seconds of silence
   };
 
-  // Stop speech recognition and clear timers
   const stopRecognition = () => {
     if (recognitionRef.current) {
       recognitionRef.current.onresult = null;
@@ -125,7 +127,6 @@ const Pack3000Widget = () => {
     }
   };
 
-  // Speak AI response and restart recognition after speaking
   const speak = (text) => {
     if ('speechSynthesis' in window) {
       isSpeakingRef.current = true;
@@ -137,7 +138,6 @@ const Pack3000Widget = () => {
           startRecognition();
         }
       };
-
       utter.onerror = (e) => {
         console.error('Speech synthesis error:', e.error);
         isSpeakingRef.current = false;
@@ -150,7 +150,6 @@ const Pack3000Widget = () => {
     }
   };
 
-  // Handle mode selection and initialize
   const handleOpen = (selectedMode) => {
     setOpen(true);
     setMode(selectedMode);
@@ -164,7 +163,6 @@ const Pack3000Widget = () => {
     }
   };
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopRecognition();
@@ -172,7 +170,6 @@ const Pack3000Widget = () => {
     };
   }, []);
 
-  // Render chat messages
   const renderMessages = () =>
     messages.map((msg, idx) => (
       <div
@@ -251,6 +248,7 @@ const Pack3000Widget = () => {
         {/* Chat/Voice Window */}
         {open && (
           <div
+            ref={chatContainerRef} // <-- ADD THE REF HERE
             style={{
               background: '#f9f9f9',
               borderRadius: 8,
