@@ -202,7 +202,7 @@ const Pack3000Widget = () => {
         width: 450,
         zIndex: 9999,
         fontFamily: 'Arial, sans-serif',
-        boxShadow: '10 14px 22px rgba(14, 13, 13, 0.15)',
+        boxShadow: '10 16px 22px rgba(14, 13, 13, 0.15)',
         display: 'flex',
         flexDirection: 'column',
         
