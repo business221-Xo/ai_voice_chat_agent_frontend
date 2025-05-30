@@ -290,7 +290,7 @@ const Pack3000Widget = () => {
 
         {/* Voice input hint */}
         {open && mode === 'voice' && (
-          <div style={{ fontStyle: 'italic', color: '#888' }}>Listening... Please speak.</div>
+          <div style={{ fontStyle: 'italic', color: '#888' }}>Listening.... Please speak.</div>
         )}
       </div>
     </div>
