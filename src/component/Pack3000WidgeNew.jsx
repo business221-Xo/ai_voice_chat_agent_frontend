@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MyButton from './elements/MyButton';
 import MyPhoneNumberCard from './elements/MyPhoneNmberCard';
+import MySendBUtton from './elements/MySendButton';
 
 const PACK_3000_LOGO = 'pack-slogan.png';
 const PHONE_NUMBER = '#11222212';
@@ -179,7 +180,7 @@ const Pack3000Widget = () => {
         style={{
           textAlign: msg.from === 'user' ? 'right' : 'left',
           marginBottom: 6,
-          padding: 6,
+          padding: 10,
           backgroundColor: msg.from === 'user' ? '#d1e7dd' : '#c6ff70',
           borderRadius: 8,
           maxWidth: '80%',
@@ -209,7 +210,7 @@ const Pack3000Widget = () => {
     >
       <div
         style={{
-          background: '#fff',
+          background: '#d8dfeb',
           borderRadius: 16,
           border: '1px solid #ddd',
           padding: 16,
@@ -259,7 +260,7 @@ const Pack3000Widget = () => {
           <div
             ref={chatContainerRef} // <-- ADD THE REF HERE
             style={{
-              background: '#ebf1fa',
+              background: '#fff',
               borderRadius: 10,
               padding: 14,
               minHeight: 200,
@@ -294,7 +295,8 @@ const Pack3000Widget = () => {
               placeholder="Type your message..."
               autoFocus
             />
-            <button type="submit">Send</button>
+            <MySendBUtton text={'Send'} />
+            {/* <button type="submit">Send</button> */}
           </form>
         )}
 
