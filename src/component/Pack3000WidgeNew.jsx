@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import MyButton from './elements/MyButton';
+import MyPhoneNumberCard from './elements/MyPhoneNmberCard';
 
 const PACK_3000_LOGO = 'pack-slogan.png';
 const PHONE_NUMBER = '#11222212';
@@ -178,7 +180,7 @@ const Pack3000Widget = () => {
           textAlign: msg.from === 'user' ? 'right' : 'left',
           marginBottom: 6,
           padding: 6,
-          backgroundColor: msg.from === 'user' ? '#d1e7dd' : '#f8d7da',
+          backgroundColor: msg.from === 'user' ? '#d1e7dd' : '#c6ff70',
           borderRadius: 8,
           maxWidth: '80%',
           alignSelf: msg.from === 'user' ? 'flex-end' : 'flex-start',
@@ -192,25 +194,28 @@ const Pack3000Widget = () => {
   return (
     <div
       style={{
+        
         position: 'fixed',
         bottom: 40,
         right: 40,
-        width: 350,
+        width: 450,
         zIndex: 9999,
         fontFamily: 'Arial, sans-serif',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        boxShadow: '10 14px 22px rgba(14, 13, 13, 0.15)',
         display: 'flex',
         flexDirection: 'column',
+        
       }}
     >
       <div
         style={{
           background: '#fff',
-          borderRadius: 8,
+          borderRadius: 16,
           border: '1px solid #ddd',
           padding: 16,
           display: 'flex',
           flexDirection: 'column',
+          
         }}
       >
         {/* Logo and controls */}
@@ -231,17 +236,21 @@ const Pack3000Widget = () => {
             margin: '6px 22px',
           }}
         >
-          <button onClick={() => handleOpen('chat')} style={{ marginRight: 8 }}>
+          {/* <button onClick={() => handleOpen('chat')} style={{ marginRight: 8 }}>
             Chat
-          </button>
-          <button onClick={() => handleOpen('voice')} style={{ marginRight: 8 }}>
+          </button> */}
+          {/* <button onClick={() => handleOpen('voice')} style={{ marginRight: 8 }}>
             Voice
-          </button>
+            </button> */}
+          
+          <MyButton text={'Chat'}  onClick={() => handleOpen('chat')}  />
+          <MyButton text={'Voice'}  onClick={() => handleOpen('voice')}  />
           <a
             href={`tel:${PHONE_NUMBER.replace('#', '')}`}
             style={{ textDecoration: 'none', color: '#007bff', fontWeight: 'bold' }}
           >
-            Call {PHONE_NUMBER}
+            {/* Call {PHONE_NUMBER} */}
+            <MyPhoneNumberCard text={PHONE_NUMBER} />
           </a>
         </div>
 
@@ -250,13 +259,14 @@ const Pack3000Widget = () => {
           <div
             ref={chatContainerRef} // <-- ADD THE REF HERE
             style={{
-              background: '#f9f9f9',
-              borderRadius: 8,
-              padding: 12,
+              background: '#ebf1fa',
+              borderRadius: 10,
+              padding: 14,
               minHeight: 200,
-              maxHeight: 300,
+              maxHeight: 600,
               overflowY: 'auto',
               marginBottom: 8,
+              margin : '8px 0px',
               display: 'flex',
               flexDirection: 'column',
             }}
@@ -275,7 +285,7 @@ const Pack3000Widget = () => {
                 setInput('');
               }
             }}
-            style={{ display: 'flex', gap: 8 }}
+            style={{ display: 'flex', gap: 8 , height: 40}}
           >
             <input
               value={input}
@@ -290,7 +300,7 @@ const Pack3000Widget = () => {
 
         {/* Voice input hint */}
         {open && mode === 'voice' && (
-          <div style={{ fontStyle: 'italic', color: '#888' }}>Listening.... Please speak.</div>
+          <div style={{ color: '#888', height: 40 }}>Listening.... Please speak.</div>
         )}
       </div>
     </div>
